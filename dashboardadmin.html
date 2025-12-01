@@ -1,0 +1,1979 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - Pterodactyl</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ffffff;
+            --secondary-color: #f8fafc;
+            --text-color: #2d3748;
+            --accent-color: #6366f1;
+            --accent-hover: #4f46e5;
+            --border-color: #e2e8f0;
+            --error-color: #ef4444;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .dark-mode {
+            --primary-color: #1e293b;
+            --secondary-color: #0f172a;
+            --text-color: #f1f5f9;
+            --accent-color: #818cf8;
+            --accent-hover: #6366f1;
+            --border-color: #334155;
+            --error-color: #f87171;
+            --success-color: #34d399;
+            --warning-color: #fbbf24;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .theme-toggle, .logout-btn {
+            background: var(--primary-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-toggle:hover, .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border: none;
+        }
+
+        .card {
+            background-color: var(--primary-color);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 24px;
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--text-color);
+            opacity: 0.9;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            font-size: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        button {
+            background: var(--gradient);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+        }
+
+        button.danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        button.warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        button.secondary {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+            transition: all 0.3s;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab:hover {
+            background-color: rgba(99, 102, 241, 0.05);
+        }
+
+        .tab.active {
+            border-bottom: 2px solid var(--accent-color);
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--secondary-color);
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+
+        tr:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .message {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+        }
+
+        .error {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid var(--error-color);
+            color: var(--error-color);
+        }
+
+        .success {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid var(--success-color);
+            color: var(--success-color);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--primary-color);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            transition: transform 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            background: var(--gradient);
+            color: white;
+            font-size: 24px;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 10px 0;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+
+        .chart-container {
+            height: 320px;
+            margin-top: 20px;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--primary-color);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .user-info i {
+            color: var(--accent-color);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-badge.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-badge.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error-color);
+        }
+
+        .status-badge.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        /* Video Container di Atas Form */
+        .video-container {
+            width: 100%;
+            height: 200px;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 20px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .dark-mode .video-container video {
+            filter: brightness(0.8);
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .video-overlay i {
+            margin-right: 10px;
+            font-size: 32px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .action-buttons button {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .refresh-btn {
+            margin-bottom: 15px;
+        }
+
+        .add-seller-form {
+            background: var(--secondary-color);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Music Player Styles */
+        .music-player {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary-color);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+            z-index: 1000;
+            width: 320px;
+            max-width: calc(100vw - 40px);
+        }
+
+        .music-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .music-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .music-controls button {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .music-info {
+            margin-top: 10px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .music-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--gradient);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--card-shadow);
+            z-index: 1001;
+            border: none;
+        }
+
+        .music-toggle i {
+            font-size: 20px;
+        }
+
+        .music-player.hidden {
+            display: none;
+        }
+
+        .playlist {
+            max-height: 150px;
+            overflow-y: auto;
+            margin-top: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        .playlist-item {
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-bottom: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .playlist-item:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .playlist-item.active {
+            background-color: rgba(99, 102, 241, 0.1);
+            color: var(--accent-color);
+            font-weight: 500;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--secondary-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-hover);
+        }
+
+        /* Table Responsiveness */
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .nav-buttons {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .action-buttons button {
+                width: 100%;
+            }
+            
+            .dashboard-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .music-player {
+                width: calc(100% - 40px);
+                right: 20px;
+                left: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-server"></i>
+                Pterodactyl Panel
+            </div>
+            <div class="nav-buttons">
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i> Mode Gelap
+                </button>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </header>
+
+        <div class="dashboard-header">
+            <h1><i class="fas fa-tachometer-alt"></i> Dashboard Admin</h1>
+            <button id="accessPanelBtn" style="background: var(--gradient);">
+                <i class="fas fa-external-link-alt"></i> Akses Panel
+            </button>
+        </div>
+
+        <div class="user-info">
+            <i class="fas fa-user-shield"></i>
+            <div>
+                <strong id="currentUser">Loading...</strong> - <span id="userRole">Developer</span>
+            </div>
+        </div>
+
+        <!-- Video Section -->
+        <div class="video-container">
+            <video autoplay muted loop playsinline>
+                <source src="https://ar-hosting.pages.dev/1764399891687.mp4" type="video/mp4">
+                Browser Anda tidak mendukung video HTML5.
+            </video>
+            <div class="video-overlay">
+                <i class="fas fa-crown"></i> Dashboard Admin Pterodactyl
+            </div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="statsPanel">
+                <i class="fas fa-chart-bar"></i> Statistik
+            </div>
+            <div class="tab" data-tab="configPanel">
+                <i class="fas fa-cog"></i> Konfigurasi
+            </div>
+            <div class="tab" data-tab="usersPanel">
+                <i class="fas fa-user-cog"></i> Kelola User
+            </div>
+            <div class="tab" data-tab="serversPanel">
+                <i class="fas fa-list"></i> List Server
+            </div>
+            <div class="tab" data-tab="musicPanel">
+                <i class="fas fa-music"></i> Kelola Musik
+            </div>
+        </div>
+
+        <!-- Stats Panel Tab -->
+        <div id="statsPanel" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <div class="stat-value" id="totalAccounts">0</div>
+                    <div class="stat-label">Total Panel Dibuat</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                    <div class="stat-value" id="todayAccounts">0</div>
+                    <div class="stat-label">Panel Dibuat Hari Ini</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="stat-value" id="activeUsers">0</div>
+                    <div class="stat-label">User Aktif</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-slash"></i>
+                    </div>
+                    <div class="stat-value" id="bannedUsers">0</div>
+                    <div class="stat-label">User Diban</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-chart-line"></i> Statistik Pembuatan Panel (7 Hari Terakhir)</h3>
+                <div class="chart-container">
+                    <canvas id="accountsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Config Panel Tab -->
+        <div id="configPanel" class="tab-content">
+            <div class="card">
+                <h2><i class="fas fa-sliders-h"></i> Konfigurasi Panel Admin</h2>
+                <p style="margin-bottom: 20px; opacity: 0.8;">Atur parameter API untuk integrasi dengan Pterodactyl</p>
+                
+                <div class="form-group">
+                    <label for="adminDomain">Domain Pterodactyl</label>
+                    <input type="text" id="adminDomain" placeholder="contoh: panel.domainanda.com">
+                    <small style="color: var(--text-color); opacity: 0.7;">Domain panel Pterodactyl Anda</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="adminPtla">Panel Token (PTLA)</label>
+                    <input type="text" id="adminPtla" placeholder="Masukkan Panel Token User (PTLA)">
+                    <small style="color: var(--text-color); opacity: 0.7;">Token aplikasi dari panel Pterodactyl</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="adminPtlc">Panel Token Client (PTLC)</label>
+                    <input type="text" id="adminPtlc" placeholder="Masukkan PTLC">
+                </div>
+
+                <div class="form-group">
+                    <label for="adminNestid">Nest ID</label>
+                    <input type="text" id="adminNestid" placeholder="Contoh: 5">
+                </div>
+
+                <div class="form-group">
+                    <label for="adminLoc">Location ID</label>
+                    <input type="text" id="adminLoc" placeholder="Contoh: 1">
+                </div>
+
+                <div class="form-group">
+                    <label for="adminEgg">Egg ID</label>
+                    <input type="text" id="adminEgg" placeholder="Contoh: 15">
+                </div>
+
+                <button id="saveConfigBtn">
+                    <i class="fas fa-save"></i> Simpan Konfigurasi
+                </button>
+                <div id="configMessage" class="message" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Users Panel Tab -->
+        <div id="usersPanel" class="tab-content">
+            <div class="card">
+                <h2><i class="fas fa-user-cog"></i> Kelola User</h2>
+                <p style="margin-bottom: 20px; opacity: 0.8;">Kelola semua user yang terdaftar di sistem</p>
+                
+                <!-- Form Tambah Seller -->
+                <div class="add-seller-form">
+                    <h3><i class="fas fa-user-plus"></i> Tambah Seller Baru</h3>
+                    <div class="form-group">
+                        <label for="newSellerUsername">Username</label>
+                        <input type="text" id="newSellerUsername" placeholder="Masukkan username seller">
+                    </div>
+                    <div class="form-group">
+                        <label for="newSellerPassword">Password</label>
+                        <input type="password" id="newSellerPassword" placeholder="Masukkan password seller">
+                    </div>
+                    <button id="addSellerBtn">
+                        <i class="fas fa-plus"></i> Tambah Seller
+                    </button>
+                    <div id="addSellerMessage" class="message" style="display: none;"></div>
+                </div>
+                
+                <div class="table-container">
+                    <table id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Tanggal Daftar</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersList">
+                            <!-- Data user akan dimuat di sini -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Servers Panel Tab -->
+        <div id="serversPanel" class="tab-content">
+            <div class="card">
+                <h2><i class="fas fa-list"></i> List Server Pterodactyl</h2>
+                <p style="margin-bottom: 20px; opacity: 0.8;">Daftar server yang aktif di Pterodactyl Panel</p>
+                
+                <button id="refreshServersBtn" class="refresh-btn">
+                    <i class="fas fa-sync-alt"></i> Refresh Server List
+                </button>
+                
+                <div class="table-container">
+                    <table id="serversTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nama</th>
+                                <th>User</th>
+                                <th>Node</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="serversList">
+                            <!-- Data server akan dimuat di sini -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Music Panel Tab -->
+        <div id="musicPanel" class="tab-content">
+            <div class="card">
+                <h2><i class="fas fa-music"></i> Kelola Musik</h2>
+                <p style="margin-bottom: 20px; opacity: 0.8;">Kelola daftar lagu yang dapat diputar di panel</p>
+                
+                <!-- Form Tambah Lagu -->
+                <div class="add-seller-form">
+                    <h3><i class="fas fa-plus-circle"></i> Tambah Lagu Baru</h3>
+                    <div class="form-group">
+                        <label for="newSongTitle">Judul Lagu</label>
+                        <input type="text" id="newSongTitle" placeholder="Masukkan judul lagu">
+                    </div>
+                    <div class="form-group">
+                        <label for="newSongUrl">URL Lagu</label>
+                        <input type="text" id="newSongUrl" placeholder="Masukkan URL lagu (mp3)">
+                        <small style="color: var(--text-color); opacity: 0.7;">Contoh: https://ar-hosting.pages.dev/1764505513010.mp3</small>
+                    </div>
+                    <button id="addSongBtn">
+                        <i class="fas fa-plus"></i> Tambah Lagu
+                    </button>
+                    <div id="addSongMessage" class="message" style="display: none;"></div>
+                </div>
+                
+                <div class="table-container">
+                    <table id="songsTable">
+                        <thead>
+                            <tr>
+                                <th>Judul</th>
+                                <th>URL</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="songsList">
+                            <!-- Data lagu akan dimuat di sini -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Music Player -->
+    <button class="music-toggle" id="musicToggle">
+        <i class="fas fa-music"></i>
+    </button>
+    
+    <div class="music-player hidden" id="musicPlayer">
+        <div class="music-header">
+            <h3><i class="fas fa-music"></i> Music Player</h3>
+            <button class="close-music" id="closeMusic">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="music-controls">
+            <button id="playMusic">
+                <i class="fas fa-play"></i> Play
+            </button>
+            <button id="pauseMusic">
+                <i class="fas fa-pause"></i> Pause
+            </button>
+            <button id="stopMusic">
+                <i class="fas fa-stop"></i> Stop
+            </button>
+            <button id="nextMusic">
+                <i class="fas fa-forward"></i> Next
+            </button>
+        </div>
+        <div class="music-info">
+            <p>Sedang diputar: <span id="currentSongTitle">Tidak ada</span></p>
+            <p>Status: <span id="musicStatus">Tidak diputar</span></p>
+        </div>
+        <div class="playlist" id="playlist">
+            <!-- Daftar lagu akan dimuat di sini -->
+        </div>
+        <audio id="bgMusic">
+            Browser Anda tidak mendukung elemen audio.
+        </audio>
+    </div>
+
+    <script>
+        // JSONBin.io configuration
+        const JSONBIN_CONFIG = {
+            API_KEY: '$2a$10$y153sL.T8zy5ukoDzEEBY.dBEFZ/QtCLC8AjYNIuU4EVe4mQI6flW',
+            USERS_BIN: '692a9bead0ea881f40075069',
+            PANELS_BIN: '692a9c28ae596e708f78091e',
+            MUSIC_BIN: '692c3d3ed0ea881f40097347' // Bin baru untuk musik
+        };
+
+        // API Endpoints
+        const API_ENDPOINTS = {
+            ADD_PANEL: 'https://piereeapi.vercel.app/create/panel',
+            LIST_SERVERS: 'https://api.nvidiabotz.xyz/pterodactyl/listserver',
+            DELETE_PANEL: 'https://api.nvidiabotz.xyz/pterodactyl/delpanel'
+        };
+
+        // DOM Elements
+        const themeToggle = document.getElementById('themeToggle');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const saveConfigBtn = document.getElementById('saveConfigBtn');
+        const configMessage = document.getElementById('configMessage');
+        const usersList = document.getElementById('usersList');
+        const serversList = document.getElementById('serversList');
+        const songsList = document.getElementById('songsList');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const totalAccountsEl = document.getElementById('totalAccounts');
+        const todayAccountsEl = document.getElementById('todayAccounts');
+        const activeUsersEl = document.getElementById('activeUsers');
+        const bannedUsersEl = document.getElementById('bannedUsers');
+        const currentUserEl = document.getElementById('currentUser');
+        const userRoleEl = document.getElementById('userRole');
+        const accessPanelBtn = document.getElementById('accessPanelBtn');
+        const refreshServersBtn = document.getElementById('refreshServersBtn');
+        const addSellerBtn = document.getElementById('addSellerBtn');
+        const addSellerMessage = document.getElementById('addSellerMessage');
+        const addSongBtn = document.getElementById('addSongBtn');
+        const addSongMessage = document.getElementById('addSongMessage');
+        
+        // Music Player Elements
+        const musicToggle = document.getElementById('musicToggle');
+        const musicPlayer = document.getElementById('musicPlayer');
+        const closeMusic = document.getElementById('closeMusic');
+        const playMusic = document.getElementById('playMusic');
+        const pauseMusic = document.getElementById('pauseMusic');
+        const stopMusic = document.getElementById('stopMusic');
+        const nextMusic = document.getElementById('nextMusic');
+        const bgMusic = document.getElementById('bgMusic');
+        const musicStatus = document.getElementById('musicStatus');
+        const currentSongTitle = document.getElementById('currentSongTitle');
+        const playlist = document.getElementById('playlist');
+
+        let currentUser = null;
+        let panelsData = [];
+        let usersData = [];
+        let serversData = [];
+        let songsData = [];
+        let configData = {};
+        let currentSongIndex = 0;
+
+        // Fungsi untuk inisialisasi aplikasi
+        async function initApp() {
+            // Cek apakah user sudah login dan role developer
+            const userData = localStorage.getItem('pterodactylUser');
+            if (!userData) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            currentUser = JSON.parse(userData);
+            
+            if (currentUser.role !== 'developer') {
+                window.location.href = 'panel.html';
+                return;
+            }
+
+            // Cek status user di JSONBin.io
+            const isActive = await checkUserStatus(currentUser.username);
+            if (!isActive) {
+                window.location.href = 'banned.html';
+                return;
+            }
+
+            // Tampilkan info user
+            currentUserEl.textContent = currentUser.username;
+            userRoleEl.textContent = 'Developer';
+
+            // Load data
+            await loadData();
+            
+            // Setup event listeners
+            setupEventListeners();
+        }
+
+        // Cek status user di JSONBin.io
+        async function checkUserStatus(username) {
+            try {
+                const usersResponse = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_CONFIG.USERS_BIN}/latest`, {
+                    headers: {
+                        'X-Master-Key': JSONBIN_CONFIG.API_KEY
+                    }
+                });
+
+                if (!usersResponse.ok) {
+                    throw new Error('Gagal mengambil data pengguna');
+                }
+
+                const usersData = await usersResponse.json();
+                const users = usersData.record.users || [];
+                const user = users.find(u => u.username === username);
+                
+                return user && user.status === 'active';
+            } catch (error) {
+                console.error('Error checking user status:', error);
+                return false;
+            }
+        }
+
+        // Load data dari JSONBin.io
+        async function loadData() {
+            try {
+                // Load panels data
+                const panelsResponse = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_CONFIG.PANELS_BIN}/latest`, {
+                    headers: {
+                        'X-Master-Key': JSONBIN_CONFIG.API_KEY
+                    }
+                });
+
+                if (panelsResponse.ok) {
+                    const panelsDataResponse = await panelsResponse.json();
+                    panelsData = panelsDataResponse.record.panels || [];
+                    configData = panelsDataResponse.record.config || {};
+                    
+                    // Load konfigurasi ke form
+                    loadConfigToForm(configData);
+                    
+                    // Update statistik
+                    updateStats();
+                    
+                    // Render chart
+                    renderChart();
+                }
+
+                // Load users data
+                const usersResponse = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_CONFIG.USERS_BIN}/latest`, {
+                    headers: {
+                        'X-Master-Key': JSONBIN_CONFIG.API_KEY
+                    }
+                });
+
+                if (usersResponse.ok) {
+                    const usersDataResponse = await usersResponse.json();
+                    usersData = usersDataResponse.record.users || [];
+                    
+                    // Load daftar user
+                    loadUsers();
+                }
+
+                // Load songs data
+                const songsResponse = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_CONFIG.MUSIC_BIN}/latest`, {
+                    headers: {
+                        'X-Master-Key': JSONBIN_CONFIG.API_KEY
+                    }
+                });
+
+                if (songsResponse.ok) {
+                    const songsDataResponse = await songsResponse.json();
+                    songsData = songsDataResponse.record.songs || [];
+                    
+                    // Load daftar lagu
+                    loadSongs();
+                    updatePlaylist();
+                } else {
+                    // Jika bin musik belum ada, buat bin baru
+                    await createMusicBin();
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+        }
+
+        // Buat bin musik baru jika belum ada
+        async function createMusicBin() {
+            try {
+                await fetch(`https://api.jsonbin.io/v3/b`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': JSONBIN_CONFIG.API_KEY
+                    },
+                    body: JSON.stringify({
+                        songs: []
+                    })
+                });
+                
+                // Tambahkan lagu default
+                songsData = [
+                    {
+                        id: '1',
+                        title: 'Lagu Default',
+                        url: 'https://ar-hosting.pages.dev/1764505513010.mp3'
+                    }
+                ];
+                
+                await saveSongs();
+                loadSongs();
+                updatePlaylist();
+            } catch (error) {
+                console.error('Error creating music bin:', error);
+            }
+        }
+
+        // Load konfigurasi ke form admin
+        function loadConfigToForm(config) {
+            document.getElementById('adminDomain').value = config.domain || '';
+            document.getElementById('adminPtla').value = config.plta || '';
+            document.getElementById('adminPtlc').value = config.pltc || '';
+            document.getElementById('adminNestid').value = config.nestid || '';
+            document.getElementById('adminLoc').value = config.loc || '';
+            document.getElementById('adminEgg').value = config.egg || '';
+        }
+
+        // Load daftar user
+        function loadUsers() {
+            usersList.innerHTML = '';
+            
+            if (usersData.length === 0) {
+                usersList.innerHTML = `
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <i class="fas fa-users"></i>
+                                <h3>Tidak ada user</h3>
+                                <p>Belum ada user yang terdaftar</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            usersData.forEach((user, index) => {
+                // Jangan tampilkan user yang sedang login
+                if (user.username === currentUser.username) return;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.username}</td>
+                    <td>${user.role === 'developer' ? 'Developer' : 'Reseller'}</td>
+                    <td>
+                        <span class="status-badge ${user.status === 'active' ? 'success' : 'error'}">
+                            ${user.status === 'active' ? 'Aktif' : 'Diban'}
+                        </span>
+                    </td>
+                    <td>${user.registeredDate || 'Tidak diketahui'}</td>
+                    <td>
+                        <div class="action-buttons">
+                            ${user.status === 'active' ? 
+                                `<button class="warning" onclick="banUser('${user.username}')">
+                                    <i class="fas fa-ban"></i> Ban
+                                </button>` :
+                                `<button class="success" onclick="unbanUser('${user.username}')">
+                                    <i class="fas fa-check"></i> Unban
+                                </button>`
+                            }
+                            <button class="danger" onclick="deleteUser('${user.username}')">
+                                <i class="fas fa-trash"></i> Hapus
+                            </button>
+                        </div>
+                    </td>
+                `;
+                usersList.appendChild(row);
+            });
+        }
+
+        // Load daftar lagu
+        function loadSongs() {
+            songsList.innerHTML = '';
+            
+            if (songsData.length === 0) {
+                songsList.innerHTML = `
+                    <tr>
+                        <td colspan="3">
+                            <div class="empty-state">
+                                <i class="fas fa-music"></i>
+                                <h3>Tidak ada lagu</h3>
+                                <p>Belum ada lagu yang ditambahkan</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            songsData.forEach((song, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${song.title}</td>
+                    <td>${song.url}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="danger" onclick="deleteSong('${song.id}')">
+                                <i class="fas fa-trash"></i> Hapus
+                            </button>
+                        </div>
+                    </td>
+                `;
+                songsList.appendChild(row);
+            });
+        }
+
+        // Update playlist di music player
+        function updatePlaylist() {
+            playlist.innerHTML = '';
+            
+            if (songsData.length === 0) {
+                playlist.innerHTML = '<div class="playlist-item">Tidak ada lagu</div>';
+                return;
+            }
+            
+            songsData.forEach((song, index) => {
+                const item = document.createElement('div');
+                item.className = 'playlist-item';
+                if (index === currentSongIndex) {
+                    item.classList.add('active');
+                }
+                item.textContent = song.title;
+                item.addEventListener('click', () => {
+                    playSong(index);
+                });
+                playlist.appendChild(item);
+            });
+        }
+
+        // Load daftar server dari Pterodactyl
+        async function loadServers() {
+            const config = {
+                domain: document.getElementById('adminDomain').value,
+                plta: document.getElementById('adminPtla').value,
+                pltc: document.getElementById('adminPtlc').value,
+                nestid: document.getElementById('adminNestid').value,
+                loc: document.getElementById('adminLoc').value,
+                egg: document.getElementById('adminEgg').value
+            };
+
+            if (!config.plta || !config.domain) {
+                serversList.innerHTML = `
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <h3>Konfigurasi Belum Lengkap</h3>
+                                <p>Isi Domain dan PTLA terlebih dahulu di tab Konfigurasi</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            try {
+                // Tampilkan loading
+                serversList.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center;">
+                            <i class="fas fa-spinner fa-spin"></i> Memuat data server...
+                        </td>
+                    </tr>
+                `;
+
+                const response = await fetch(`${API_ENDPOINTS.LIST_SERVERS}?domain=${config.domain}&plta=${config.plta}`);
+                const data = await response.json();
+                
+                serversData = data.servers || [];
+                
+                if (serversData.length === 0) {
+                    serversList.innerHTML = `
+                        <tr>
+                            <td colspan="6">
+                                <div class="empty-state">
+                                    <i class="fas fa-server"></i>
+                                    <h3>Tidak ada server</h3>
+                                    <p>Belum ada server yang dibuat di Pterodactyl</p>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                serversList.innerHTML = '';
+                serversData.forEach(server => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${server.id}</td>
+                        <td>${server.name}</td>
+                        <td>${server.user}</td>
+                        <td>${server.node}</td>
+                        <td>
+                            <span class="status-badge ${server.status === 'running' ? 'success' : server.status === 'offline' ? 'error' : 'warning'}">
+                                ${server.status === 'running' ? 'Aktif' : server.status === 'offline' ? 'Offline' : server.status}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="danger" onclick="deletePterodactylServer('${server.id}', '${server.name}')">
+                                    <i class="fas fa-trash"></i> Hapus
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    serversList.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading servers:', error);
+                serversList.innerHTML = `
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <h3>Gagal Memuat Data</h3>
+                                <p>${error.message}</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Update statistik
+        function updateStats() {
+            // Total panels
+            totalAccountsEl.textContent = panelsData.length;
+            
+            // Today's panels
+            const today = new Date().toDateString();
+            const todayPanels = panelsData.filter(panel => {
+                return new Date(panel.date).toDateString() === today;
+            });
+            todayAccountsEl.textContent = todayPanels.length;
+            
+            // Active users
+            const activeUsers = usersData.filter(user => user.status === 'active');
+            activeUsersEl.textContent = activeUsers.length;
+            
+            // Banned users
+            const bannedUsers = usersData.filter(user => user.status === 'banned');
+            bannedUsersEl.textContent = bannedUsers.length;
+        }
+
+        // Render chart
+        function renderChart() {
+            const ctx = document.getElementById('accountsChart').getContext('2d');
+            
+            // Get last 7 days
+            const dates = [];
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                dates.push(date.toDateString());
+            }
+            
+            // Count panels for each day
+            const data = dates.map(date => {
+                return panelsData.filter(panel => {
+                    return new Date(panel.date).toDateString() === date;
+                }).length;
+            });
+            
+            // Format dates for display
+            const labels = dates.map(date => {
+                const d = new Date(date);
+                return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+            });
+            
+            // Destroy existing chart if it exists
+            if (window.accountsChartInstance) {
+                window.accountsChartInstance.destroy();
+            }
+            
+            // Create new chart
+            window.accountsChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Panel Dibuat',
+                        data: data,
+                        backgroundColor: 'rgba(99, 102, 241, 0.7)',
+                        borderColor: 'rgba(99, 102, 241, 1)',
+                        borderWidth: 1,
+                        borderRadius: 8,
+                        borderSkipped: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Toggle tema gelap/terang
+            themeToggle.addEventListener('click', toggleTheme);
+
+            // Logout
+            logoutBtn.addEventListener('click', handleLogout);
+
+            // Tab navigation
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    switchTab(tabId);
+                });
+            });
+
+            // Simpan konfigurasi admin
+            saveConfigBtn.addEventListener('click', saveConfig);
+
+            // Akses panel
+            accessPanelBtn.addEventListener('click', () => {
+                window.location.href = 'panel.html';
+            });
+
+            // Refresh servers
+            refreshServersBtn.addEventListener('click', loadServers);
+
+            // Tambah seller
+            addSellerBtn.addEventListener('click', addSeller);
+            
+            // Tambah lagu
+            addSongBtn.addEventListener('click', addSong);
+            
+            // Music player controls
+            musicToggle.addEventListener('click', toggleMusicPlayer);
+            closeMusic.addEventListener('click', toggleMusicPlayer);
+            playMusic.addEventListener('click', playBackgroundMusic);
+            pauseMusic.addEventListener('click', pauseBackgroundMusic);
+            stopMusic.addEventListener('click', stopBackgroundMusic);
+            nextMusic.addEventListener('click', nextSong);
+            
+            // Update music status
+            bgMusic.addEventListener('play', () => {
+                musicStatus.textContent = 'Sedang diputar';
+            });
+            
+            bgMusic.addEventListener('pause', () => {
+                musicStatus.textContent = 'Dijeda';
+            });
+            
+            bgMusic.addEventListener('ended', () => {
+                nextSong();
+            });
+        }
+
+        // Toggle tema gelap/terang
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            if (document.body.classList.contains('dark-mode')) {
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i> Mode Terang';
+                localStorage.setItem('pterodactylTheme', 'dark');
+            } else {
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i> Mode Gelap';
+                localStorage.setItem('pterodactylTheme', 'light');
+            }
+        }
+
+        // Handle logout
+        function handleLogout() {
+            localStorage.removeItem('pterodactylUser');
+            window.location.href = 'login.html';
+        }
+
+        // Ganti tab
+        function switchTab(tabId) {
+            tabs.forEach(tab => {
+                if (tab.getAttribute('data-tab') === tabId) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+
+            tabContents.forEach(content => {
+                if (content.id === tabId) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+
+            // Jika pindah ke tab statistik, update chart
+            if (tabId === 'statsPanel') {
+                renderChart();
+            }
+            
+            // Jika pindah ke tab servers, load servers
+            if (tabId === 'serversPanel') {
+                loadServers();
+            }
+        }
+
+        // Simpan konfigurasi admin
+        async function saveConfig() {
+            const config = {
+                domain: document.getElementById('adminDomain').value,
+                plta: document.getElementById('adminPtla').value,
+                pltc: document.getElementById('adminPtlc').value,
+                nestid: document.getElementById('adminNestid').value,
+                loc: document.getElementById('adminLoc').value,
+                egg: document.getElementById('adminEgg').value
+            };
+
+            try {
+                // Ambil data panels yang ada
+                const panelsResponse = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_CONFIG.PANELS_BIN}/latest`, {
+                    headers: {
+                        'X-Master-Key': JSONBIN_CONFIG.API_KEY
+                    }
+                });
+
+                const panelsDataResponse = await panelsResponse.json();
+                
+                // Update data di JSONBin.io
+                await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_CONFIG.PANELS_BIN}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': JSONBIN_CONFIG.API_KEY
+                    },
+                    body: JSON.stringify({
+                        ...panelsDataResponse.record,
+                        config: config
+                    })
+                });
+                
+                showMessage(configMessage, 'Konfigurasi berhasil disimpan!', 'success');
+            } catch (error) {
+                console.error('Error saving config:', error);
+                showMessage(configMessage, 'Gagal menyimpan konfigurasi!', 'error');
+            }
+        }
+
+        // Tambah seller baru
+        async function addSeller() {
+            const username = document.getElementById('newSellerUsername').value.trim();
+            const password = document.getElementById('newSellerPassword').value.trim();
+
+            if (!username || !password) {
+                showMessage(addSellerMessage, 'Username dan password harus diisi!', 'error');
+                return;
+            }
+
+            // Cek apakah username sudah ada
+            const existingUser = usersData.find(user => user.username === username);
+            if (existingUser) {
+                showMessage(addSellerMessage, 'Username sudah terdaftar!', 'error');
+                return;
+            }
+
+            try {
+                // Tambah user baru
+                const newUser = {
+                    username: username,
+                    password: password,
+                    role: 'reseller',
+                    status: 'active',
+                    registeredDate: new Date().toLocaleDateString('id-ID')
+                };
+
+                usersData.push(newUser);
+
+                // Update data di JSONBin.io
+                await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_CONFIG.USERS_BIN}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': JSONBIN_CONFIG.API_KEY
+                    },
+                    body: JSON.stringify({
+                        users: usersData
+                    })
+                });
+
+                // Reset form
+                document.getElementById('newSellerUsername').value = '';
+                document.getElementById('newSellerPassword').value = '';
+
+                // Reload data
+                loadUsers();
+                updateStats();
+                
+                showMessage(addSellerMessage, 'Seller berhasil ditambahkan!', 'success');
+            } catch (error) {
+                console.error('Error adding seller:', error);
+                showMessage(addSellerMessage, 'Gagal menambahkan seller!', 'error');
+            }
+        }
+
+        // Tambah lagu baru
+        async function addSong() {
+            const title = document.getElementById('newSongTitle').value.trim();
+            const url = document.getElementById('newSongUrl').value.trim();
+
+            if (!title || !url) {
+                showMessage(addSongMessage, 'Judul dan URL lagu harus diisi!', 'error');
+                return;
+            }
+
+            // Validasi URL
+            if (!url.startsWith('http')) {
+                showMessage(addSongMessage, 'URL harus valid!', 'error');
+                return;
+            }
+
+            try {
+                // Tambah lagu baru
+                const newSong = {
+                    id: Date.now().toString(),
+                    title: title,
+                    url: url
+                };
+
+                songsData.push(newSong);
+
+                // Update data di JSONBin.io
+                await saveSongs();
+
+                // Reset form
+                document.getElementById('newSongTitle').value = '';
+                document.getElementById('newSongUrl').value = '';
+
+                // Reload data
+                loadSongs();
+                updatePlaylist();
+                
+                showMessage(addSongMessage, 'Lagu berhasil ditambahkan!', 'success');
+            } catch (error) {
+                console.error('Error adding song:', error);
+                showMessage(addSongMessage, 'Gagal menambahkan lagu!', 'error');
+            }
+        }
+
+        // Simpan data lagu ke JSONBin
+        async function saveSongs() {
+            await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_CONFIG.MUSIC_BIN}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': JSONBIN_CONFIG.API_KEY
+                },
+                body: JSON.stringify({
+                    songs: songsData
+                })
+            });
+        }
+
+        // Hapus lagu
+        async function deleteSong(songId) {
+            if (confirm('Apakah Anda yakin ingin menghapus lagu ini?')) {
+                const songIndex = songsData.findIndex(s => s.id === songId);
+                if (songIndex !== -1) {
+                    songsData.splice(songIndex, 1);
+                    
+                    try {
+                        // Update data di JSONBin.io
+                        await saveSongs();
+                        
+                        // Reload data
+                        loadSongs();
+                        updatePlaylist();
+                        
+                        // Jika lagu yang dihapus sedang diputar, hentikan
+                        if (currentSongIndex === songIndex) {
+                            stopBackgroundMusic();
+                        }
+                    } catch (error) {
+                        console.error('Error deleting song:', error);
+                        alert('Gagal menghapus lagu!');
+                    }
+                }
+            }
+        }
+
+        // Hapus server di Pterodactyl - DIPERBAIKI
+        async function deletePterodactylServer(serverId, serverName) {
+            if (confirm(`Apakah Anda yakin ingin menghapus server "${serverName}" (ID: ${serverId}) di Pterodactyl?`)) {
+                try {
+                    const config = {
+                        domain: document.getElementById('adminDomain').value,
+                        plta: document.getElementById('adminPtla').value
+                    };
+
+                    if (!config.plta || !config.domain) {
+                        alert('Konfigurasi Domain dan PTLA belum lengkap!');
+                        return;
+                    }
+
+                    // Tampilkan loading
+                    const deleteBtn = event.target.closest('button');
+                    const originalText = deleteBtn.innerHTML;
+                    deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menghapus...';
+                    deleteBtn.disabled = true;
+
+                    const response = await fetch(`${API_ENDPOINTS.DELETE_PANEL}?domain=${config.domain}&plta=${config.plta}&id=${serverId}`);
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        showMessage(configMessage, `Server "${serverName}" berhasil dihapus di Pterodactyl!`, 'success');
+                        // Refresh server list
+                        loadServers();
+                    } else {
+                        showMessage(configMessage, `Gagal menghapus server: ${data.message || 'Unknown error'}`, 'error');
+                    }
+                    
+                    // Reset button
+                    deleteBtn.innerHTML = originalText;
+                    deleteBtn.disabled = false;
+                } catch (error) {
+                    console.error('Error deleting Pterodactyl server:', error);
+                    showMessage(configMessage, 'Gagal menghapus server di Pterodactyl!', 'error');
+                    
+                    // Reset button
+                    const deleteBtn = event.target.closest('button');
+                    deleteBtn.innerHTML = '<i class="fas fa-trash"></i> Hapus';
+                    deleteBtn.disabled = false;
+                }
+            }
+        }
+
+        // Ban user
+        async function banUser(username) {
+            if (confirm(`Apakah Anda yakin ingin memban user ${username}?`)) {
+                const userIndex = usersData.findIndex(u => u.username === username);
+                if (userIndex !== -1) {
+                    usersData[userIndex].status = 'banned';
+                    
+                    try {
+                        // Update data di JSONBin.io
+                        await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_CONFIG.USERS_BIN}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Master-Key': JSONBIN_CONFIG.API_KEY
+                            },
+                            body: JSON.stringify({
+                                users: usersData
+                            })
+                        });
+                        
+                        // Reload data
+                        loadUsers();
+                        updateStats();
+                    } catch (error) {
+                        console.error('Error banning user:', error);
+                        alert('Gagal memban user!');
+                    }
+                }
+            }
+        }
+
+        // Unban user
+        async function unbanUser(username) {
+            if (confirm(`Apakah Anda yakin ingin membuka ban user ${username}?`)) {
+                const userIndex = usersData.findIndex(u => u.username === username);
+                if (userIndex !== -1) {
+                    usersData[userIndex].status = 'active';
+                    
+                    try {
+                        // Update data di JSONBin.io
+                        await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_CONFIG.USERS_BIN}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Master-Key': JSONBIN_CONFIG.API_KEY
+                            },
+                            body: JSON.stringify({
+                                users: usersData
+                            })
+                        });
+                        
+                        // Reload data
+                        loadUsers();
+                        updateStats();
+                    } catch (error) {
+                        console.error('Error unbanning user:', error);
+                        alert('Gagal membuka ban user!');
+                    }
+                }
+            }
+        }
+
+        // Hapus user
+        async function deleteUser(username) {
+            if (confirm(`Apakah Anda yakin ingin menghapus user ${username}?`)) {
+                const userIndex = usersData.findIndex(u => u.username === username);
+                if (userIndex !== -1) {
+                    usersData.splice(userIndex, 1);
+                    
+                    try {
+                        // Update data di JSONBin.io
+                        await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_CONFIG.USERS_BIN}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Master-Key': JSONBIN_CONFIG.API_KEY
+                            },
+                            body: JSON.stringify({
+                                users: usersData
+                            })
+                        });
+                        
+                        // Reload data
+                        loadUsers();
+                        updateStats();
+                    } catch (error) {
+                        console.error('Error deleting user:', error);
+                        alert('Gagal menghapus user!');
+                    }
+                }
+            }
+        }
+
+        // Tampilkan pesan
+        function showMessage(element, message, type) {
+            element.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+            element.className = `message ${type}`;
+            element.style.display = 'flex';
+            
+            // Sembunyikan pesan setelah 5 detik
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+
+        // Music player functions
+        function toggleMusicPlayer() {
+            musicPlayer.classList.toggle('hidden');
+        }
+        
+        function playBackgroundMusic() {
+            if (songsData.length === 0) {
+                musicStatus.textContent = 'Tidak ada lagu';
+                return;
+            }
+            
+            playSong(currentSongIndex);
+        }
+        
+        function playSong(index) {
+            if (index >= 0 && index < songsData.length) {
+                currentSongIndex = index;
+                bgMusic.src = songsData[index].url;
+                currentSongTitle.textContent = songsData[index].title;
+                updatePlaylist();
+                
+                bgMusic.play().catch(error => {
+                    console.error('Error playing music:', error);
+                    musicStatus.textContent = 'Gagal memutar musik';
+                });
+            }
+        }
+        
+        function pauseBackgroundMusic() {
+            bgMusic.pause();
+        }
+        
+        function stopBackgroundMusic() {
+            bgMusic.pause();
+            bgMusic.currentTime = 0;
+            musicStatus.textContent = 'Dihentikan';
+        }
+        
+        function nextSong() {
+            if (songsData.length === 0) return;
+            
+            currentSongIndex = (currentSongIndex + 1) % songsData.length;
+            playSong(currentSongIndex);
+        }
+
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('pterodactylTheme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            themeToggle.innerHTML = '<i class="fas fa-sun"></i> Mode Terang';
+        }
+
+        // Inisialisasi aplikasi
+        initApp();
+    </script>
+</body>
+</html>
