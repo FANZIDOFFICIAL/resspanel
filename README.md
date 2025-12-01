@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://ar-hosting.pages.dev/1764399891687.mp4" alt="FanzID Official Logo" width="100"/>
+  <img src="https://avatars.githubusercontent.com/u/90633897" alt="FanzID Official Logo" width="100"/>
   <h1>Reseller Panel Web</h1>
   <h3>Meningkatkan Bisnis Reseller Anda Dengan Mudah dan Profesional</h3>
   <p>
