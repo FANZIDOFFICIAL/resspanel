@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reseller - panel Pterodactyl</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ffffff;
+            --secondary-color: #f8fafc;
+            --text-color: #2d3748;
+            --accent-color: #6366f1;
+            --accent-hover: #4f46e5;
+            --border-color: #e2e8f0;
+            --error-color: #ef4444;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .dark-mode {
+            --primary-color: #1e293b;
+            --secondary-color: #0f172a;
+            --text-color: #f1f5f9;
+            --accent-color: #818cf8;
+            --accent-hover: #6366f1;
+            --border-color: #334155;
+            --error-color: #f87171;
+            --success-color: #34d399;
+            --warning-color: #fbbf24;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+            line-height: 1.6;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Video Background */
+        .video-container {
+            width: 100%;
+            height: 200px;
+            border-radius: 15px 15px 0 0;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: -20px;
+            z-index: 2;
+        }
+
+        .video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .dark-mode .video-container video {
+            filter: brightness(0.8);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .content-wrapper {
+            background: var(--primary-color);
+            border-radius: 0 0 15px 15px;
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .theme-toggle, .logout-btn {
+            background: var(--primary-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-toggle:hover, .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-color: var(--accent-color);
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border: none;
+        }
+
+        .logout-btn:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        }
+
+        .card {
+            background-color: var(--primary-color);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 24px;
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--text-color);
+            opacity: 0.9;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            font-size: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        button {
+            background: var(--gradient);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .message {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+        }
+
+        .error {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid var(--error-color);
+            color: var(--error-color);
+        }
+
+        .success {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid var(--success-color);
+            color: var(--success-color);
+        }
+
+        .warning {
+            background-color: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--warning-color);
+            color: var(--warning-color);
+        }
+
+        .ram-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 16px;
+            margin-top: 10px;
+        }
+
+        .ram-option {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            background: var(--primary-color);
+        }
+
+        .ram-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        .ram-option:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .ram-option:hover::before {
+            transform: scaleX(1);
+        }
+
+        .ram-option.selected {
+            border-color: var(--accent-color);
+            background-color: rgba(99, 102, 241, 0.05);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .ram-option.selected::before {
+            transform: scaleX(1);
+        }
+
+        .ram-label {
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 5px;
+            color: var(--text-color);
+        }
+
+        .ram-desc {
+            font-size: 14px;
+            opacity: 0.7;
+            color: var(--text-color);
+        }
+
+        .panel-result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            background: var(--primary-color);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
+            display: none;
+        }
+
+        .panel-result.success {
+            display: block;
+            border-left: 4px solid var(--success-color);
+        }
+
+        .panel-result.error {
+            display: block;
+            border-left: 4px solid var(--error-color);
+        }
+
+        
+         .panel-details {
+    background: var(--secondary-color);
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 20px;
+}
+
+.panel-details p {
+    margin: 0;
+    padding: 8px 0;
+    display: flex;
+    flex-direction: column;
+    word-break: break-word;
+}
+
+.panel-details strong {
+    color: var(--accent-color);
+    margin-bottom: 4px;
+    font-size: 14px;
+    min-width: 120px;
+}
+
+.panel-details span,
+.panel-details a {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-all;
+    font-size: 14px;
+    color: var(--text-color);
+}
+
+.panel-details a {
+    color: var(--accent-color);
+    text-decoration: none;
+    display: inline-block;
+    max-width: 100%;
+}
+
+.panel-details a:hover {
+    text-decoration: underline;
+}
+
+
+.url-container {
+    grid-column: span 2;
+    margin-top: 10px;
+}
+
+.url-container strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.url-container a {
+    display: inline-block;
+    max-width: 100%;
+    word-break: break-all;
+    padding: 8px;
+    background: rgba(99, 102, 241, 0.1);
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+
+@media (max-width: 768px) {
+    .panel-details {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .panel-details p {
+        flex-direction: column;
+    }
+    
+    .url-container {
+        grid-column: span 1;
+    }
+}
+
+        .rules {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .rules ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .rules li {
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+
+        .copy-btn {
+            background: var(--gradient);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-color);
+        }
+
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-color);
+        }
+
+        h3 {
+            color: var(--text-color);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--primary-color);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+
+        .user-info i {
+            color: var(--accent-color);
+        }
+
+        /* History Styles */
+        .history-section {
+            margin-top: 40px;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .history-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .history-table th,
+        .history-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .history-table th {
+            background-color: var(--secondary-color);
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .history-table tr:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-error {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--error-color);
+        }
+
+        .empty-history {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        .empty-history i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: var(--border-color);
+        }
+
+        /* Music Player Styles - DIPERBAIKI */
+        .music-player {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary-color);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+            z-index: 1000;
+            width: 320px;
+            max-width: calc(100vw - 40px);
+        }
+
+        .music-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .music-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .music-controls button {
+            padding: 8px 12px;
+            font-size: 12px;
+            flex: 1;
+            min-width: 70px;
+        }
+
+        .music-info {
+            margin-top: 10px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .music-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--gradient);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--card-shadow);
+            z-index: 1001;
+            border: none;
+        }
+
+        .music-toggle i {
+            font-size: 20px;
+        }
+
+        .music-player.hidden {
+            display: none;
+        }
+
+        .playlist {
+            max-height: 150px;
+            overflow-y: auto;
+            margin-top: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        .playlist-item {
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-bottom: 4px;
+            transition: background-color 0.2s;
+            font-size: 14px;
+        }
+
+        .playlist-item:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .playlist-item.active {
+            background-color: rgba(99, 102, 241, 0.1);
+            color: var(--accent-color);
+            font-weight: 500;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--secondary-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-hover);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .video-container {
+                height: 150px;
+            }
+            
+            .content-wrapper {
+                padding: 20px;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .nav-buttons {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .ram-options {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+            
+            .history-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .history-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .history-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .music-player {
+                width: calc(100% - 40px);
+                right: 20px;
+                left: 20px;
+            }
+            
+            .music-controls button {
+                padding: 6px 10px;
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Video Background -->
+        <div class="video-container">
+            <video id="bgVideo" autoplay muted loop playsinline onerror="showVideoFallback()">
+                <source src="https://ar-hosting.pages.dev/1764399891687.mp4" type="video/mp4">
+                <source src="https://ar-hosting.pages.dev/1764399891687.mp4" type="video/mp4">
+                Browser Anda tidak mendukung video HTML5.
+            </video>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content-wrapper">
+            <header>
+                <div class="logo">
+                    <i class="fas fa-server"></i>
+                    Pterodactyl Panel
+                </div>
+                <div class="nav-buttons">
+                    <button class="theme-toggle" id="themeToggle">
+                        <i class="fas fa-moon"></i> Mode Gelap
+                    </button>
+                    <button class="logout-btn" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </header>
+
+            <div class="user-info">
+                <i class="fas fa-user"></i>
+                <div>
+                    <strong id="currentUser">Loading...</strong> - <span id="userRole">Reseller</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-plus-circle"></i> Buat Server Baru</h2>
+                <p style="margin-bottom: 20px; opacity: 0.8; color: var(--text-color);">Isi informasi di bawah ini untuk membuat server Pterodactyl baru</p>
+                
+                <div class="form-group">
+                    <label for="userUsername">Username Panel</label>
+                    <input type="text" id="userUsername" placeholder="Masukkan username untuk server Anda">
+                </div>
+                <div class="form-group">
+                    <label for="userRam">Pilih Paket RAM</label>
+                    <div class="ram-options" id="ramOptions">
+                        <!-- RAM options will be generated by JavaScript -->
+                    </div>
+                </div>
+                <button id="createServerBtn">
+                    <i class="fas fa-rocket"></i> Buat Server Sekarang
+                </button>
+                <div id="serverMessage" class="message" style="display: none;"></div>
+            </div>
+
+            <!-- Panel Result -->
+            <div id="panelResult" class="panel-result">
+                <!-- Content will be filled by JavaScript -->
+            </div>
+
+            <!-- History Section -->
+            <div class="history-section">
+                <div class="card">
+                    <div class="history-header">
+                        <h2><i class="fas fa-history"></i> Riwayat Pembuatan Panel</h2>
+                        <div class="history-actions">
+                            <button id="refreshHistoryBtn" class="copy-btn">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                            <button id="clearHistoryBtn" class="logout-btn">
+                                <i class="fas fa-trash"></i> Hapus Riwayat
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="historyContent">
+                        <!-- History content will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Music Player - DIPERBAIKI -->
+    <button class="music-toggle" id="musicToggle">
+        <i class="fas fa-music"></i>
+    </button>
+    
+    <div class="music-player hidden" id="musicPlayer">
+        <div class="music-header">
+            <h3><i class="fas fa-music"></i> Music Player</h3>
+            <button class="close-music" id="closeMusic">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="music-controls">
+            <button id="prevMusic">
+                <i class="fas fa-backward"></i> Prev
+            </button>
+            <button id="togglePlayPause">
+                <i class="fas fa-play"></i> Play
+            </button>
+            <button id="stopMusic">
+                <i class="fas fa-stop"></i> Stop
+            </button>
+            <button id="nextMusic">
+                <i class="fas fa-forward"></i> Next
+            </button>
+        </div>
+        <div class="music-info">
+            <p>Sedang diputar: <span id="currentSongTitle">Tidak ada</span></p>
+            <p>Status: <span id="musicStatus">Tidak diputar</span></p>
+        </div>
+        <div class="playlist" id="playlist">
+            <!-- Daftar lagu akan dimuat di sini -->
+        </div>
+        <audio id="bgMusic">
+            Browser Anda tidak mendukung elemen audio.
+        </audio>
+    </div>
+
+    <script>
+        // Configuration
+        const CONFIG = {
+            API_KEY: '$2a$10$y153sL.T8zy5ukoDzEEBY.dBEFZ/QtCLC8AjYNIuU4EVe4mQI6flW',
+            USERS_BIN: '692a9bead0ea881f40075069',
+            PANELS_BIN: '692a9c28ae596e708f78091e',
+            MUSIC_BIN: '692c3d3ed0ea881f40097347'
+        };
+
+        const ramOptions = [
+            { ram: 1024, disk: 1024, cpu: 100, label: "1 GB" },
+            { ram: 2048, disk: 2048, cpu: 200, label: "2 GB" },
+            { ram: 3072, disk: 3072, cpu: 300, label: "3 GB" },
+            { ram: 4096, disk: 4096, cpu: 400, label: "4 GB" },
+            { ram: 5120, disk: 5120, cpu: 500, label: "5 GB" },
+            { ram: 6144, disk: 6144, cpu: 600, label: "6 GB" },
+            { ram: 7168, disk: 7168, cpu: 700, label: "7 GB" },
+            { ram: 8192, disk: 8192, cpu: 800, label: "8 GB" },
+            { ram: 9216, disk: 9216, cpu: 900, label: "9 GB" },
+            { ram: 10240, disk: 10240, cpu: 1000, label: "10 GB" },
+            { ram: 0, disk: 0, cpu: 0, label: "Unlimited" }
+        ];
+
+        // DOM Elements
+        const themeToggle = document.getElementById('themeToggle');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const createServerBtn = document.getElementById('createServerBtn');
+        const serverMessage = document.getElementById('serverMessage');
+        const ramOptionsContainer = document.getElementById('ramOptions');
+        const panelResult = document.getElementById('panelResult');
+        const currentUserEl = document.getElementById('currentUser');
+        const userRoleEl = document.getElementById('userRole');
+        const bgVideo = document.getElementById('bgVideo');
+        const historyContent = document.getElementById('historyContent');
+        const refreshHistoryBtn = document.getElementById('refreshHistoryBtn');
+        const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+        
+        // Music Player Elements - DIPERBAIKI
+        const musicToggle = document.getElementById('musicToggle');
+        const musicPlayer = document.getElementById('musicPlayer');
+        const closeMusic = document.getElementById('closeMusic');
+        const togglePlayPause = document.getElementById('togglePlayPause');
+        const stopMusic = document.getElementById('stopMusic');
+        const nextMusic = document.getElementById('nextMusic');
+        const prevMusic = document.getElementById('prevMusic');
+        const bgMusic = document.getElementById('bgMusic');
+        const musicStatus = document.getElementById('musicStatus');
+        const currentSongTitle = document.getElementById('currentSongTitle');
+        const playlist = document.getElementById('playlist');
+
+        // Variables
+        let selectedRamOption = null;
+        let currentUser = null;
+        let songsData = [];
+        let currentSongIndex = 0;
+        let isPlaying = false; // Status pemutaran musik
+
+        // Initialize App
+        async function initApp() {
+            console.log('🚀 Initializing app...');
+            
+            // Check if user is logged in
+            const userData = localStorage.getItem('pterodactylUser');
+            if (!userData) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                currentUser = JSON.parse(userData);
+                console.log('✅ Current user:', currentUser);
+                
+                // Check user status
+                const isActive = await checkUserStatus(currentUser.username);
+                if (!isActive) {
+                    window.location.href = 'banned.html';
+                    return;
+                }
+
+                // Show user info
+                currentUserEl.textContent = currentUser.username;
+                userRoleEl.textContent = currentUser.role === 'developer' ? 'Developer' : 'Reseller';
+
+                // Generate RAM options
+                generateRamOptions();
+
+                // Setup event listeners
+                setupEventListeners();
+
+                // Load saved theme
+                loadSavedTheme();
+
+                // Load history
+                await loadHistory();
+                
+                // Load songs
+                await loadSongs();
+
+            } catch (error) {
+                console.error('❌ Error in initApp:', error);
+                showMessage(serverMessage, 'Error loading app: ' + error.message, 'error');
+            }
+        }
+
+        // Load saved theme
+        function loadSavedTheme() {
+            const savedTheme = localStorage.getItem('pterodactylTheme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i> Mode Terang';
+            }
+        }
+
+        // Check user status
+        async function checkUserStatus(username) {
+            try {
+                const response = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.USERS_BIN}/latest`, {
+                    headers: { 'X-Master-Key': CONFIG.API_KEY }
+                });
+
+                if (!response.ok) throw new Error('Gagal mengambil data pengguna');
+
+                const data = await response.json();
+                const users = data.record?.users || [];
+                const user = users.find(u => u.username === username);
+                
+                return user && user.status === 'active';
+            } catch (error) {
+                console.error('Error checking user status:', error);
+                return false;
+            }
+        }
+
+        // Generate RAM options
+        function generateRamOptions() {
+            ramOptionsContainer.innerHTML = '';
+            
+            ramOptions.forEach(option => {
+                const optionEl = document.createElement('div');
+                optionEl.className = 'ram-option';
+                
+                const labelEl = document.createElement('div');
+                labelEl.className = 'ram-label';
+                labelEl.textContent = option.label;
+                
+                const descEl = document.createElement('div');
+                descEl.className = 'ram-desc';
+                
+                if (option.ram === 0) {
+                    descEl.textContent = 'RAM & Disk & CPU Unlimited';
+                } else {
+                    descEl.textContent = `${option.ram} MB RAM, ${option.disk} MB Disk, ${option.cpu}% CPU`;
+                }
+                
+                optionEl.appendChild(labelEl);
+                optionEl.appendChild(descEl);
+                
+                optionEl.addEventListener('click', () => {
+                    document.querySelectorAll('.ram-option').forEach(el => {
+                        el.classList.remove('selected');
+                    });
+                    
+                    optionEl.classList.add('selected');
+                    selectedRamOption = option;
+                });
+                
+                ramOptionsContainer.appendChild(optionEl);
+            });
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            themeToggle.addEventListener('click', toggleTheme);
+            logoutBtn.addEventListener('click', handleLogout);
+            createServerBtn.addEventListener('click', createServer);
+            refreshHistoryBtn.addEventListener('click', loadHistory);
+            clearHistoryBtn.addEventListener('click', clearHistory);
+            
+            // Music player controls - DIPERBAIKI
+            musicToggle.addEventListener('click', toggleMusicPlayer);
+            closeMusic.addEventListener('click', toggleMusicPlayer);
+            togglePlayPause.addEventListener('click', togglePlayPauseMusic);
+            stopMusic.addEventListener('click', stopBackgroundMusic);
+            nextMusic.addEventListener('click', nextSong);
+            prevMusic.addEventListener('click', prevSong);
+            
+            // Update music status
+            bgMusic.addEventListener('play', () => {
+                isPlaying = true;
+                updatePlayPauseButton();
+                musicStatus.textContent = 'Sedang diputar';
+            });
+            
+            bgMusic.addEventListener('pause', () => {
+                isPlaying = false;
+                updatePlayPauseButton();
+                musicStatus.textContent = 'Dijeda';
+            });
+            
+            bgMusic.addEventListener('ended', () => {
+                nextSong();
+            });
+        }
+
+        // Toggle theme
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            if (document.body.classList.contains('dark-mode')) {
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i> Mode Terang';
+                localStorage.setItem('pterodactylTheme', 'dark');
+            } else {
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i> Mode Gelap';
+                localStorage.setItem('pterodactylTheme', 'light');
+            }
+        }
+
+        // Handle logout
+        function handleLogout() {
+            localStorage.removeItem('pterodactylUser');
+            window.location.href = 'login.html';
+        }
+
+        // Create server - VERSI DIPERBAIKI UNTUK FORMAT RESPONSE BARU
+        async function createServer() {
+            const username = document.getElementById('userUsername').value.trim();
+
+            // Validation
+            if (!username) {
+                showMessage(serverMessage, 'Username harus diisi!', 'error');
+                return;
+            }
+
+            if (!selectedRamOption) {
+                showMessage(serverMessage, 'Pilih paket RAM!', 'error');
+                return;
+            }
+
+            try {
+                // Show loading
+                createServerBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Membuat Server...';
+                createServerBtn.disabled = true;
+
+                // Get admin config
+                const configResponse = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.PANELS_BIN}/latest`, {
+                    headers: { 'X-Master-Key': CONFIG.API_KEY }
+                });
+
+                if (!configResponse.ok) throw new Error('Gagal mengambil konfigurasi admin');
+
+                const configData = await configResponse.json();
+                const config = configData.record?.config || {};
+
+                if (!config.plta || !config.pltc || !config.domain || !config.nestid || !config.loc || !config.egg) {
+                    throw new Error('Konfigurasi admin belum lengkap');
+                }
+
+                // Create API URL
+                const apiUrl = `https://piereeapi.vercel.app/create/panel?ptla=${config.plta}&ptlc=${config.pltc}&domain=${config.domain}&egg=${config.egg}&nestid=${config.nestid}&loc=${config.loc}&disk=${selectedRamOption.disk}&cpu=${selectedRamOption.cpu}&ram=${selectedRamOption.ram}&username=${username}`;
+                
+                console.log('🌐 API URL:', apiUrl);
+
+                // Send request to API
+                const response = await fetch(apiUrl);
+                const result = await response.text();
+                
+                console.log('📡 Raw API Response:', result);
+
+                // Response validation - DIPERBAIKI UNTUK FORMAT BARU
+                let isSuccess = false;
+                let responseData = {};
+
+                try {
+                    responseData = JSON.parse(result);
+                    console.log('📡 Parsed JSON Response:', responseData);
+                    
+                    // Check success berdasarkan format response baru
+                    isSuccess = (
+                        responseData.status === true ||
+                        responseData.status === 'success' ||
+                        responseData.success === true ||
+                        responseData.email !== undefined || // Jika ada email, anggap sukses
+                        responseData.panel_url !== undefined // Jika ada panel_url, anggap sukses
+                    );
+
+                    console.log('✅ Is Success:', isSuccess);
+
+                } catch (e) {
+                    // Jika bukan JSON, coba parsing sebagai text
+                    console.log('📡 Response is not JSON, checking text');
+                    console.log('📡 Response text:', result);
+                    
+                    isSuccess = (
+                        result.toLowerCase().includes('success') ||
+                        result.toLowerCase().includes('berhasil') ||
+                        result.toLowerCase().includes('created') ||
+                        result.toLowerCase().includes('panel created') ||
+                        response.status === 200
+                    );
+                    
+                    // Untuk response text, kita tidak bisa extract data detail
+                    responseData = {
+                        message: result,
+                        status: isSuccess
+                    };
+                }
+
+                console.log('📊 Final Response Data:', responseData);
+
+                if (isSuccess) {
+                    // Format response data sesuai dengan struktur yang diharapkan
+                    const finalResponseData = {
+                        status: responseData.status || true,
+                        creator: responseData.creator || 'System',
+                        email: responseData.email || `${username}@${config.domain}`,
+                        username: responseData.username || username,
+                        password: responseData.password || 'password123',
+                        domain: responseData.domain || config.domain,
+                        cpu: responseData.cpu !== undefined ? responseData.cpu : selectedRamOption.cpu,
+                        ram: responseData.ram !== undefined ? responseData.ram : selectedRamOption.ram,
+                        disk: responseData.disk !== undefined ? responseData.disk : selectedRamOption.disk,
+                        server_id: responseData.server_id || 'Unknown',
+                        server_name: responseData.server_name || `${username}'s Server`,
+                        panel_url: responseData.panel_url || `https://${config.domain}`,
+                        message: responseData.message || 'Panel berhasil dibuat'
+                    };
+
+                    console.log('🎉 Success! Final data:', finalResponseData);
+
+                    // Save to history
+                    await saveToHistory(username, selectedRamOption, 'success', finalResponseData);
+                    
+                    // Show success panel
+                    showSuccessPanel(username, selectedRamOption, config, finalResponseData);
+                    showMessage(serverMessage, 'Server berhasil dibuat!', 'success');
+                    
+                    // Reset form
+                    resetForm();
+                } else {
+                    console.log('❌ Failed response:', responseData);
+                    // Save to history
+                    await saveToHistory(username, selectedRamOption, 'error', responseData);
+                    
+                    // Show error
+                    const errorMsg = responseData.message || responseData.error || 'Terjadi kesalahan yang tidak diketahui';
+                    showErrorPanel(errorMsg);
+                    showMessage(serverMessage, 'Gagal membuat server: ' + errorMsg, 'error');
+                }
+
+            } catch (error) {
+                console.error('❌ Error:', error);
+                await saveToHistory(username, selectedRamOption, 'error', { error: error.message });
+                showErrorPanel(error.message);
+                showMessage(serverMessage, 'Error: ' + error.message, 'error');
+            } finally {
+                createServerBtn.innerHTML = '<i class="fas fa-rocket"></i> Buat Server Sekarang';
+                createServerBtn.disabled = false;
+                await loadHistory();
+            }
+        }
+
+        // Save to history (localStorage + JSONBin)
+        async function saveToHistory(username, ramOption, status, responseData = {}) {
+            const historyItem = {
+                id: Date.now(),
+                username: username,
+                ram: ramOption.ram,
+                disk: ramOption.disk,
+                cpu: ramOption.cpu,
+                status: status,
+                date: new Date().toLocaleString('id-ID'),
+                createdBy: currentUser.username,
+                response: responseData
+            };
+
+            // Save to localStorage
+            try {
+                const history = JSON.parse(localStorage.getItem('panelHistory') || '[]');
+                history.unshift(historyItem);
+                
+                // Keep only last 50 items
+                if (history.length > 50) history.splice(50);
+                
+                localStorage.setItem('panelHistory', JSON.stringify(history));
+            } catch (error) {
+                console.error('Error saving to localStorage:', error);
+            }
+
+            // Save to JSONBin (optional)
+            try {
+                const binResponse = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.PANELS_BIN}/latest`, {
+                    headers: { 'X-Master-Key': CONFIG.API_KEY }
+                });
+
+                if (binResponse.ok) {
+                    const binData = await binResponse.json();
+                    const panels = binData.record?.panels || [];
+                    
+                    panels.unshift({
+                        ...historyItem,
+                        binId: Date.now().toString()
+                    });
+
+                    await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.PANELS_BIN}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Master-Key': CONFIG.API_KEY
+                        },
+                        body: JSON.stringify({
+                            ...binData.record,
+                            panels: panels
+                        })
+                    });
+                }
+            } catch (error) {
+                console.error('Error saving to JSONBin:', error);
+            }
+        }
+
+        // Load history
+        async function loadHistory() {
+            try {
+                let history = JSON.parse(localStorage.getItem('panelHistory') || '[]');
+                const userHistory = history.filter(item => item.createdBy === currentUser.username);
+                
+                displayHistory(userHistory);
+            } catch (error) {
+                console.error('Error loading history:', error);
+                historyContent.innerHTML = '<div class="message error">Gagal memuat riwayat</div>';
+            }
+        }
+
+        // Display history
+        function displayHistory(panels) {
+            if (panels.length === 0) {
+                historyContent.innerHTML = `
+                    <div class="empty-history">
+                        <i class="fas fa-history"></i>
+                        <h3>Belum ada riwayat</h3>
+                        <p>Panel yang Anda buat akan muncul di sini</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Username</th>
+                            <th>Spesifikasi</th>
+                            <th>Status</th>
+                            <th>Info</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            panels.forEach(panel => {
+                const spec = panel.ram === 0 ? 
+                    'Unlimited' : 
+                    `${panel.ram}MB RAM, ${panel.disk}MB Disk, ${panel.cpu}% CPU`;
+                
+                const statusClass = panel.status === 'success' ? 'status-success' : 'status-error';
+                const statusText = panel.status === 'success' ? 'Berhasil' : 'Gagal';
+                
+                const info = panel.response?.message || panel.response?.error || '-';
+
+                html += `
+                    <tr>
+                        <td>${panel.date}</td>
+                        <td>${panel.username}</td>
+                        <td>${spec}</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td title="${info}">${info.length > 30 ? info.substring(0, 30) + '...' : info}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+            `;
+
+            historyContent.innerHTML = html;
+        }
+
+        // Clear history
+        async function clearHistory() {
+            if (!confirm('Apakah Anda yakin ingin menghapus semua riwayat?')) return;
+            
+            try {
+                const history = JSON.parse(localStorage.getItem('panelHistory') || '[]');
+                const otherUsersHistory = history.filter(item => item.createdBy !== currentUser.username);
+                
+                localStorage.setItem('panelHistory', JSON.stringify(otherUsersHistory));
+                await loadHistory();
+                showMessage(serverMessage, 'Riwayat berhasil dihapus!', 'success');
+            } catch (error) {
+                showMessage(serverMessage, 'Gagal menghapus riwayat', 'error');
+            }
+        }
+
+        function showSuccessPanel(username, ramOption, config, responseData) {
+    panelResult.className = 'panel-result success';
+
+    const displayData = {
+        email: responseData.email,
+        username: responseData.username,
+        password: responseData.password,
+        domain: responseData.domain,
+        cpu: responseData.cpu === 0 ? 'Unlimited' : `${responseData.cpu}%`,
+        ram: responseData.ram === 0 ? 'Unlimited' : `${responseData.ram} MB`,
+        disk: responseData.disk === 0 ? 'Unlimited' : `${responseData.disk} MB`,
+        server_id: responseData.server_id,
+        server_name: responseData.server_name,
+        panel_url: responseData.panel_url,
+        creator: responseData.creator
+    };
+
+    panelResult.innerHTML = `
+        <h3><i class="fas fa-check-circle" style="color: var(--success-color);"></i> Panel Berhasil Dibuat!</h3>
+        <p style="color: var(--text-color); margin-bottom: 20px;">Server berhasil dibuat di sistem Pterodactyl:</p>
+
+        <div class="panel-details">
+            <p><strong>Email:</strong> <span>${displayData.email}</span></p>
+            <p><strong>Username:</strong> <span>${displayData.username}</span></p>
+            <p><strong>Password:</strong> <span>${displayData.password}</span></p>
+            <p><strong>Domain Panel:</strong> <span>${displayData.domain}</span></p>
+            <p><strong>RAM:</strong> <span>${displayData.ram}</span></p>
+            <p><strong>Disk:</strong> <span>${displayData.disk}</span></p>
+            <p><strong>CPU:</strong> <span>${displayData.cpu}</span></p>
+            <p><strong>Server ID:</strong> <span>${displayData.server_id}</span></p>
+            <p><strong>Server Name:</strong> <span>${displayData.server_name}</span></p>
+            <p><strong>Dibuat oleh:</strong> <span>${displayData.creator}</span></p>
+            
+            <div class="url-container">
+                <strong>Panel URL:</strong>
+                <a href="${displayData.panel_url}" target="_blank" title="Klik untuk membuka panel">
+                    ${displayData.panel_url}
+                </a>
+            </div>
+        </div>
+
+        <div class="rules">
+            <h4 style="color: var(--text-color); margin-bottom: 10px;">Informasi Penting:</h4>
+            <ul>
+                <li><strong>Jangan DDOS</strong> panel atau server lain, itu akan memblokir akun Anda.</li>
+                <li><strong>Jangan bagikan panel secara gratis</strong> ke orang lain tanpa izin.</li>
+                <li><strong>Simpan data login!</strong> Admin tidak akan memberikan panel kedua kalinya jika hilang.</li>
+                <li>Panel butuh beberapa menit untuk siap sepenuhnya.</li>
+                <li>Gunakan username dan password di atas untuk login ke panel.</li>
+                <li>Jika ada masalah, hubungi admin / owner panel.</li>
+            </ul>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button class="copy-btn" id="copyDetailsBtn">
+                <i class="fas fa-copy"></i> Salin Detail Login
+            </button>
+            <button class="copy-btn" id="openPanelBtn" style="background: var(--gradient);">
+                <i class="fas fa-external-link-alt"></i> Buka Panel
+            </button>
+        </div>
+    `;
+
+    panelResult.scrollIntoView({ behavior: 'smooth' });
+
+            // Tombol salin detail
+            document.getElementById('copyDetailsBtn').addEventListener('click', () => {
+                const textToCopy = 
+`🔐 DETAIL LOGIN PANEL PTERODACTYL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📧 Email: ${displayData.email}
+👤 Username: ${displayData.username}
+🔑 Password: ${displayData.password}
+🌐 Panel URL: ${displayData.panel_url}
+💾 RAM: ${displayData.ram}
+💿 Disk: ${displayData.disk}
+⚡ CPU: ${displayData.cpu}
+🆔 Server ID: ${displayData.server_id}
+🏷️ Server Name: ${displayData.server_name}
+©️ COPYRIGHT BY FANZID OFFICIAL 
+BUY RESELLER PANEL VIA WEBSITE HUBUNGI t.me/fanzidoffc
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️ PENTING:
+• Jangan DDOS panel nya
+• Jangan bagikan panel secara gratis
+• Simpan data login dengan baik
+• Panel butuh beberapa menit untuk aktif
+• Hubungi admin jika ada masalah 
+`;
+
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    alert('Detail login berhasil disalin!');
+                }).catch(err => {
+                    console.error('Gagal menyalin: ', err);
+                    // Fallback untuk browser lama
+                    const textArea = document.createElement('textarea');
+                    textArea.value = textToCopy;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    alert('Detail login berhasil disalin!');
+                });
+            });
+
+            // Tombol buka panel
+            document.getElementById('openPanelBtn').addEventListener('click', () => {
+                window.open(displayData.panel_url, '_blank');
+            });
+        }
+
+        // Show error panel
+        function showErrorPanel(message = null) {
+            panelResult.className = 'panel-result error';
+            panelResult.innerHTML = `
+                <h3><i class="fas fa-times-circle" style="color: var(--error-color);"></i> Gagal Membuat Panel</h3>
+                <p style="color: var(--text-color);">${message || 'Terjadi kesalahan yang tidak diketahui. Silakan coba lagi.'}</p>
+                <div class="rules">
+                    <h4 style="color: var(--text-color);">Solusi yang bisa dicoba:</h4>
+                    <ul>
+                        <li>Gunakan username yang berbeda</li>
+                        <li>Pastikan konfigurasi admin sudah benar</li>
+                        <li>Coba lagi dalam beberapa menit</li>
+                        <li>Hubungi administrator jika masalah berlanjut</li>
+                    </ul>
+                </div>
+            `;
+            panelResult.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Reset form
+        function resetForm() {
+            document.getElementById('userUsername').value = '';
+            document.querySelectorAll('.ram-option').forEach(el => {
+                el.classList.remove('selected');
+            });
+            selectedRamOption = null;
+        }
+
+        // Show message
+        function showMessage(element, message, type) {
+            element.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+            element.className = `message ${type}`;
+            element.style.display = 'flex';
+            
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+
+        // Video fallback
+        function showVideoFallback() {
+            console.log('Video error, showing fallback');
+            bgVideo.style.display = 'none';
+        }
+        
+        // Music player functions - DIPERBAIKI
+        function toggleMusicPlayer() {
+            musicPlayer.classList.toggle('hidden');
+        }
+        
+        function togglePlayPauseMusic() {
+            if (songsData.length === 0) {
+                musicStatus.textContent = 'Tidak ada lagu';
+                return;
+            }
+            
+            if (isPlaying) {
+                pauseBackgroundMusic();
+            } else {
+                playBackgroundMusic();
+            }
+        }
+        
+        function playBackgroundMusic() {
+            if (songsData.length === 0) {
+                musicStatus.textContent = 'Tidak ada lagu';
+                return;
+            }
+            
+            playSong(currentSongIndex);
+        }
+        
+        function playSong(index) {
+            if (index >= 0 && index < songsData.length) {
+                currentSongIndex = index;
+                bgMusic.src = songsData[index].url;
+                currentSongTitle.textContent = songsData[index].title;
+                updatePlaylist();
+                
+                bgMusic.play().then(() => {
+                    isPlaying = true;
+                    updatePlayPauseButton();
+                    musicStatus.textContent = 'Sedang diputar';
+                }).catch(error => {
+                    console.error('Error playing music:', error);
+                    musicStatus.textContent = 'Gagal memutar musik';
+                    isPlaying = false;
+                    updatePlayPauseButton();
+                });
+            }
+        }
+        
+        function pauseBackgroundMusic() {
+            bgMusic.pause();
+            isPlaying = false;
+            updatePlayPauseButton();
+            musicStatus.textContent = 'Dijeda';
+        }
+        
+        function stopBackgroundMusic() {
+            bgMusic.pause();
+            bgMusic.currentTime = 0;
+            isPlaying = false;
+            updatePlayPauseButton();
+            musicStatus.textContent = 'Dihentikan';
+        }
+        
+        function nextSong() {
+            if (songsData.length === 0) return;
+            
+            currentSongIndex = (currentSongIndex + 1) % songsData.length;
+            playSong(currentSongIndex);
+        }
+        
+        function prevSong() {
+            if (songsData.length === 0) return;
+            
+            currentSongIndex = (currentSongIndex - 1 + songsData.length) % songsData.length;
+            playSong(currentSongIndex);
+        }
+        
+        function updatePlayPauseButton() {
+            if (isPlaying) {
+                togglePlayPause.innerHTML = '<i class="fas fa-pause"></i> Pause';
+            } else {
+                togglePlayPause.innerHTML = '<i class="fas fa-play"></i> Play';
+            }
+        }
+        
+        // Load songs from JSONBin
+        async function loadSongs() {
+            try {
+                const songsResponse = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.MUSIC_BIN}/latest`, {
+                    headers: {
+                        'X-Master-Key': CONFIG.API_KEY
+                    }
+                });
+
+                if (songsResponse.ok) {
+                    const songsDataResponse = await songsResponse.json();
+                    songsData = songsDataResponse.record?.songs || [];
+                    updatePlaylist();
+                } else {
+                    console.log('🎵 Bin musik belum ada atau error');
+                }
+            } catch (error) {
+                console.error('Error loading songs:', error);
+            }
+        }
+        
+        // Update playlist in music player
+        function updatePlaylist() {
+            playlist.innerHTML = '';
+            
+            if (songsData.length === 0) {
+                playlist.innerHTML = '<div class="playlist-item">Tidak ada lagu</div>';
+                return;
+            }
+            
+            songsData.forEach((song, index) => {
+                const item = document.createElement('div');
+                item.className = 'playlist-item';
+                if (index === currentSongIndex) {
+                    item.classList.add('active');
+                }
+                item.textContent = song.title;
+                item.addEventListener('click', () => {
+                    playSong(index);
+                });
+                playlist.appendChild(item);
+            });
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
